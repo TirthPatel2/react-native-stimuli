@@ -33,12 +33,8 @@ const Result = () => {
                         {visuals.colors.map((color: any) =>
                             <Text
                                 key={color}
-                                style={{
-                                    height: 25,
-                                    width: 25,
-                                    borderRadius: 25 / 2,
-                                    backgroundColor: color,
-                                }} />)}
+                                style={[style.colorOptions, { backgroundColor: color }]}
+                                 />)}
                     </View>
                     <View style={style.list}>
                         {visuals.numbers.map((number: any) => <Text key={number} style={style.visualNumber}>{number}</Text>)}
@@ -85,6 +81,11 @@ const style = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         paddingHorizontal: 10,
+    },
+    colorOptions: {
+      height: 25,
+      width: 25,
+      borderRadius: 25 / 2,
     },
     visualNumber: {
         color: "gray",

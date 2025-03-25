@@ -1,17 +1,15 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import Checkbox from "@/components/ui/Checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { colorOptions, numberList } from "@/utils/constants";
 
-const numbers = numberList(10);
-const arrows = ["up", "down", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
+const numbersOptions = numberList(10);
+const arrowsOptions = ["up", "down", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
 
 const Home = () => {
-  const router = useRouter();
   const {
     selectedArrow,
     selectedColor,
@@ -23,6 +21,15 @@ const Home = () => {
   } = useAppContext();
 
   const [showAllNumbers, setShowAllNumbers] = useState(false);
+  const [arrows, setArrows] = useState(selectedArrow);
+  const [colors, setColors] = useState(selectedColor);
+  const [numbers, setNumbers] = useState(selectedNumber);
+
+  useEffect(() => {
+    setArrows(selectedArrow);
+    setColors(selectedColor);
+    setNumbers(selectedNumber);
+  }, [selectedArrow, selectedColor, selectedNumber]);
 
   return (
     <View style={style.container}>
@@ -33,14 +40,9 @@ const Home = () => {
           {colorOptions.map((color: any) =>
             <Text
               key={color}
-              style={{
-                height: 25,
-                width: 25,
-                borderRadius: 25 / 2,
-                backgroundColor: color,
-              }}
-              onPress={() => updateSelectedColor({ ...selectedColor, [color]: !selectedColor[color] })}>
-              {selectedColor[color] && <Icon
+              style={[style.colorOptions, { backgroundColor: color }]}
+              onPress={() => setColors((prev: any) => ({ ...prev, [color]: !prev[color] }))}>
+              {colors[color] && <Icon
                 name="check-bold"
                 size={24}
               />}
@@ -49,29 +51,29 @@ const Home = () => {
         {/* Arrows */}
         <View style={style.titleContainer}><Text style={style.title}>Arrows</Text></View>
         <View style={style.list}>
-          {arrows.map((arrow: any) =>
+          {arrowsOptions.map((arrow: any) =>
             <Text
               key={arrow}
-              onPress={() => updateSelectedArrow({ ...selectedArrow, [arrow]: !selectedArrow[arrow] })}>
+              onPress={() => setArrows((prev: any) => ({ ...prev, [arrow]: !prev[arrow] }))}>
               <Icon
                 name={`arrow-${arrow}-thick`}
                 size={40}
-                color={selectedArrow[arrow] ? "black" : "gray"}
+                color={arrows[arrow] ? "black" : "gray"}
               />
             </Text>)}
         </View>
         {/* Numbers */}
         <View style={style.titleContainer}><Text style={style.title}>Numbers</Text></View>
         <View style={style.list}>
-          {numbers.slice(0, showAllNumbers ? 10 : 6).map((num: number) => (
+          {numbersOptions.slice(0, showAllNumbers ? 10 : 6).map((num: number) => (
             <Checkbox
               key={num}
               label={num.toString()}
-              toggleValue={() => updateSelectedNumber({
-                ...selectedNumber,
-                [num]: !selectedNumber[num],
-              })}
-              isChecked={selectedNumber[num] || false}
+              toggleValue={() => setNumbers((prev: any) => ({
+                ...prev,
+                [num]: !prev[num],
+              }))}
+              isChecked={numbers[num] || false}
             />))}
         </View>
         <TouchableOpacity>
@@ -86,7 +88,9 @@ const Home = () => {
       {/* Control Buttons */}
       <View style={style.bottomButtons}>
         <TouchableOpacity style={style.bottomBtn} onPress={() => {
-          router.push("/result");
+          updateSelectedArrow(arrows);
+          updateSelectedColor(colors);
+          updateSelectedNumber(numbers);
         }}>
           <Text style={style.bottomBtnLable}>Save</Text>
         </TouchableOpacity>
@@ -127,7 +131,11 @@ const style = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 10,
   },
-  colorOptions: {},
+  colorOptions: {
+    height: 25,
+    width: 25,
+    borderRadius: 25 / 2,
+  },
   btn: {
     width: "100%",
     textAlign: "center",
@@ -136,19 +144,20 @@ const style = StyleSheet.create({
   },
   bottomButtons: {
     flexDirection: "row",
+    justifyContent: "space-around",
     flexShrink: 0,
     gap: 0,
-    borderTopWidth: 1,
   },
   bottomBtn: {
-    width: "50%",
     alignItems: "center",
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
+    backgroundColor: "blue",
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
 
   },
   bottomBtnLable: {
-    color: "blue",
+    color: "white",
     fontSize: 25,
   },
 })
